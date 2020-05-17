@@ -14,7 +14,7 @@ def get_name_file(link):
         name = name[1]
     result = ''
     for letter in name:
-        letter_new = re.sub('\W', '-', letter)
+        letter_new = re.sub(r'\W', '-', letter)
         result += letter_new
     final_name = '{}.html'.format(result)
     return final_name
