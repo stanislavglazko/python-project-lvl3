@@ -4,6 +4,9 @@ install:
 lint:
 	@poetry run flake8 page_loader
 
+publish:
+	poetry publish -r foo3
+
 selfcheck:
 	poetry check
 

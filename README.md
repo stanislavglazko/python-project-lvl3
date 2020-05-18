@@ -11,4 +11,4 @@ Load a page with my tool!
 To load a page write 'page-loader' and  a link with 'http' or 'https' part and a path to a folder for saving the page 
 You are able not to write the path to the folder if you want to save the page in current folder
 
-   
+<a href="https://asciinema.org/a/W3ecBbOdniDXdJKuWVe53lHKX" target="_blank"><img src="https://asciinema.org/a/W3ecBbOdniDXdJKuWVe53lHKX.svg" /></a>   
