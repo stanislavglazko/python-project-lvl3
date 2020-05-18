@@ -13,4 +13,4 @@ build: check
 	@poetry build
 
 run_test:
-	poetry run pytest --cov=page-loader --cov-report xml tests/
+	poetry run pytest --cov=page_loader --cov-report xml tests/
