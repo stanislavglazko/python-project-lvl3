@@ -27,4 +27,4 @@ def save_page(link, folder=''):
         path_to_file = os.path.join(folder, get_name_file(link))
     with open(path_to_file, 'w', encoding='utf-8') as f:
         f.write(load_page(link))
-    return get_name_file(link)
+    return path_to_file

@@ -16,4 +16,4 @@ def test():
     for key, item in check.items():
         with tempfile.TemporaryDirectory() as temp:
             result = loader.save_page(key, temp)
-            assert result == item
+            assert result == os.path.join(temp, item)
