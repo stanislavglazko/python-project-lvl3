@@ -44,8 +44,7 @@ def get_link(soup, new_folder, link):
 
 
 def get_scripts_img(soup, new_folder, link):
-    my_list = soup.find_all(["script", "img"])
-    for i in my_list:
+    for i in soup.find_all(["script", "img"]):
         if 'src' in i.attrs:
             j = i['src']
             if j[0] == '/' and j[1] != '/':
