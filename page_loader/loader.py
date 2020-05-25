@@ -43,22 +43,9 @@ def get_link(soup, new_folder, link):
                 i['href'] = path_to_extra_file
 
 
-def get_scripts(soup, new_folder, link):
-    list_script = soup.find_all("script")
-    for i in list_script:
-        if 'src' in i.attrs:
-            j = i['src']
-            if j[0] == '/' and j[1] != '/':
-                path_to_extra_file = os.path.join(new_folder,
-                                                  get_name(j[1:], extra=1))
-                with open(path_to_extra_file, 'w', encoding='utf-8') as f2:
-                    f2.write(load_page(link + j))
-                i['src'] = path_to_extra_file
-
-
-def get_img(soup, new_folder, link):
-    list_img = soup.find_all("img")
-    for i in list_img:
+def get_scripts_img(soup, new_folder, link):
+    my_list = soup.find_all(["script", "img"])
+    for i in my_list:
         if 'src' in i.attrs:
             j = i['src']
             if j[0] == '/' and j[1] != '/':
@@ -85,8 +72,7 @@ def save_page(link, folder=''):
         new_folder = os.path.join(folder, get_name(link, folder=1))
     os.mkdir(new_folder)
     get_link(soup, new_folder, link)
-    get_scripts(soup, new_folder, link)
-    get_img(soup, new_folder, link)
+    get_scripts_img(soup, new_folder, link)
     html = soup.prettify("utf-8")
     with open(path_to_file, "wb") as file:
         file.write(html)
