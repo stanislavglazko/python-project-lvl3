@@ -4,7 +4,7 @@ from page_loader.loader import save_page
 
 def main():
     args = parse_args()
-    save_page(args.link, args.output)
+    save_page(args.link, args.output, level_logging=args.level)
 
 
 if __name__ == '__main__':

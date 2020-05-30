@@ -13,4 +13,6 @@ You are able not to write the path to the folder if you want to save the page in
 
 <a href="https://asciinema.org/a/W3ecBbOdniDXdJKuWVe53lHKX" target="_blank"><img src="https://asciinema.org/a/W3ecBbOdniDXdJKuWVe53lHKX.svg" /></a>
 
-<a href="https://asciinema.org/a/gdN119Aa2itcY84eZMARHZTIn" target="_blank"><img src="https://asciinema.org/a/gdN119Aa2itcY84eZMARHZTIn.svg" /></a>   
+<a href="https://asciinema.org/a/gdN119Aa2itcY84eZMARHZTIn" target="_blank"><img src="https://asciinema.org/a/gdN119Aa2itcY84eZMARHZTIn.svg" /></a>
+
+<a href="https://asciinema.org/a/RofRkUu6NIdfJJw0FlYTKsfjK" target="_blank"><img src="https://asciinema.org/a/RofRkUu6NIdfJJw0FlYTKsfjK.svg" /></a>  

@@ -2,14 +2,17 @@ import requests
 import re
 import os
 from bs4 import BeautifulSoup
+import logging
 
 
 def load_page(link):
+    logging.info('Loading page')
     page = requests.get(link)
     return page.text
 
 
 def get_name(link, folder=None, extra=None):
+    logging.info('Getting name')
     name = re.split('//', link)
     if len(name) != 1:
         name = name[1]
@@ -27,10 +30,12 @@ def get_name(link, folder=None, extra=None):
         final_name = '{}{}'.format(result, f)
     else:
         final_name = '{}.html'.format(result)
+    logging.debug(final_name)
     return final_name
 
 
 def get_link(soup, new_folder, link):
+    logging.info('Getting links')
     list_link = soup.find_all("link")
     for i in list_link:
         j = i['href']
@@ -44,6 +49,7 @@ def get_link(soup, new_folder, link):
 
 
 def get_scripts_img(soup, new_folder, link):
+    logging.info('Getting scripts and img')
     for i in soup.find_all(["script", "img"]):
         if 'src' in i.attrs:
             j = i['src']
@@ -55,11 +61,25 @@ def get_scripts_img(soup, new_folder, link):
                 i['src'] = path_to_extra_file
 
 
-def save_page(link, folder=''):
+def save_page(link, folder='', level_logging=''):
+    if level_logging == 'debug' or level_logging == 'DEBUG':
+        level_logging = logging.DEBUG
+    elif level_logging == 'warning' or level_logging == 'WARNING':
+        level_logging = logging.WARNING
+    elif level_logging == 'error' or level_logging == 'ERROR':
+        level_logging = logging.ERROR
+    elif level_logging == 'critical' or level_logging == 'CRITICAL':
+        level_logging = logging.CRITICAL
+    else:
+        level_logging = logging.INFO
+    logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s',
+                        filename='my.log', filemode='w', level=level_logging)
+    logging.info('Starting saving the page')
     if folder is None:
         path_to_file = get_name(link)
     else:
         path_to_file = os.path.join(folder, get_name(link))
+    logging.debug(path_to_file)
     with open(path_to_file, 'w', encoding='utf-8') as f:
         f.write(load_page(link))
     with open(path_to_file, "r") as fx:
@@ -69,10 +89,12 @@ def save_page(link, folder=''):
         new_folder = get_name(link, folder=1)
     else:
         new_folder = os.path.join(folder, get_name(link, folder=1))
+    logging.warning('Do not save one page twice in one folder')
     os.mkdir(new_folder)
     get_link(soup, new_folder, link)
     get_scripts_img(soup, new_folder, link)
     html = soup.prettify("utf-8")
     with open(path_to_file, "wb") as file:
         file.write(html)
+    logging.info('The page is saved')
     return path_to_file, new_folder

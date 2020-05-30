@@ -2,6 +2,7 @@ import pytest
 import os
 import tempfile
 from page_loader import loader
+import logging
 
 
 check = {
@@ -15,6 +16,6 @@ check = {
 def test():
     for key, item in check.items():
         with tempfile.TemporaryDirectory() as temp:
-            result = loader.save_page(key, temp)
+            result = loader.save_page(key, temp, level_logging='debug')
             assert result[0] == os.path.join(temp, item[0])
             assert result[1] == os.path.join(temp, item[1])

@@ -10,5 +10,11 @@ def parse_args():
         default=None,
         help='folder for saving link'
     )
+    parser.add_argument(
+        '-l', '--level',
+        type=str,
+        default=None,
+        help='level of logging'
+    )
     args = parser.parse_args()
     return args
