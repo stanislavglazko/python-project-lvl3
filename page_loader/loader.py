@@ -5,9 +5,28 @@ from bs4 import BeautifulSoup
 import logging
 
 
+class KnownError(Exception):
+    pass
+
+
+list_of_logging = ['debug', 'DEBUG', 'INFO', 'info', 'warning', 'WARNING',
+                   'ERROR', 'error', 'critical', 'CRITICAL', None, '']
+
+
 def load_page(link):
     logging.info('Loading page')
-    page = requests.get(link)
+    try:
+        page = requests.get(link)
+        assert page.status_code == 200
+    except requests.exceptions.MissingSchema as e:
+        logging.error('Invalid URL. No schema supplied', exc_info=True)
+        raise KnownError('URL error') from e
+    except requests.exceptions.ConnectionError as e:
+        logging.error('Connection error', exc_info=True)
+        raise KnownError('Connection error') from e
+    except AssertionError as e:
+        logging.error('Assertion error', exc_info=True)
+        raise KnownError('Assertion error') from e
     return page.text
 
 
@@ -24,6 +43,8 @@ def get_name(link, folder=None, extra=None):
     for letter in name:
         letter_new = re.sub(r'\W', '-', letter)
         result += letter_new
+        if len(result) >= 40:
+            break
     if folder:
         final_name = '{}_files'.format(result)
     elif extra:
@@ -62,6 +83,15 @@ def get_scripts_img(soup, new_folder, link):
 
 
 def save_page(link, folder='', level_logging=''):
+    try:
+        assert level_logging in list_of_logging
+    except Exception as e:
+        logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s',
+                            filename='my.log',
+                            filemode='w',
+                            level=logging.ERROR)
+        logging.error('Your level of logging is not correct', exc_info=True)
+        raise KnownError('Level is not correct') from e
     if level_logging == 'debug' or level_logging == 'DEBUG':
         level_logging = logging.DEBUG
     elif level_logging == 'warning' or level_logging == 'WARNING':
@@ -73,15 +103,21 @@ def save_page(link, folder='', level_logging=''):
     else:
         level_logging = logging.INFO
     logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s',
-                        filename='my.log', filemode='w', level=level_logging)
-    logging.info('Starting saving the page')
+                        filename='my.log',
+                        filemode='w',
+                        level=level_logging)
+    logging.debug(level_logging)
     if folder is None:
         path_to_file = get_name(link)
     else:
         path_to_file = os.path.join(folder, get_name(link))
     logging.debug(path_to_file)
-    with open(path_to_file, 'w', encoding='utf-8') as f:
-        f.write(load_page(link))
+    try:
+        with open(path_to_file, 'w', encoding='utf-8') as f:
+            f.write(load_page(link))
+    except IOError as e:
+        logging.error('No such directory', exc_info=True)
+        raise KnownError('No such directory') from e
     with open(path_to_file, "r") as fx:
         contents = fx.read()
     soup = BeautifulSoup(contents, "lxml")
@@ -89,8 +125,10 @@ def save_page(link, folder='', level_logging=''):
         new_folder = get_name(link, folder=1)
     else:
         new_folder = os.path.join(folder, get_name(link, folder=1))
-    logging.warning('Do not save one page twice in one folder')
-    os.mkdir(new_folder)
+    try:
+        os.mkdir(new_folder)
+    except IOError:
+        logging.warning('Do not save one page twice in one folder')
     get_link(soup, new_folder, link)
     get_scripts_img(soup, new_folder, link)
     html = soup.prettify("utf-8")
