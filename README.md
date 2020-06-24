@@ -13,10 +13,18 @@ You are able not to write the path to the folder if you want to save the page in
 
 <a href="https://asciinema.org/a/W3ecBbOdniDXdJKuWVe53lHKX" target="_blank"><img src="https://asciinema.org/a/W3ecBbOdniDXdJKuWVe53lHKX.svg" /></a>
 
+Loading files
+
 <a href="https://asciinema.org/a/gdN119Aa2itcY84eZMARHZTIn" target="_blank"><img src="https://asciinema.org/a/gdN119Aa2itcY84eZMARHZTIn.svg" /></a>
+
+Logging
 
 <a href="https://asciinema.org/a/RofRkUu6NIdfJJw0FlYTKsfjK" target="_blank"><img src="https://asciinema.org/a/RofRkUu6NIdfJJw0FlYTKsfjK.svg" /></a>
 
+Working with errors
+
 <a href="https://asciinema.org/a/syzT0ZmJwAVsXX4iW1Rn2W8Y4" target="_blank"><img src="https://asciinema.org/a/syzT0ZmJwAVsXX4iW1Rn2W8Y4.svg" /></a>
+
+Downloading progress
 
 <a href="https://asciinema.org/a/YCHeb6LUrVSFOUNwKv0jAX6NS" target="_blank"><img src="https://asciinema.org/a/YCHeb6LUrVSFOUNwKv0jAX6NS.svg" /></a>  

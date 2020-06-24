@@ -18,6 +18,8 @@ def test():
             result = loader.save_page(key, temp, level_logging='debug')
             assert result[0] == os.path.join(temp, item[0])
             assert result[1] == os.path.join(temp, item[1])
+            assert os.path.isfile(result[0]) is True
+            assert os.path.exists(result[1]) is True
 
 
 def test_exception():
