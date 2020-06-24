@@ -3,6 +3,7 @@ import re
 import os
 from bs4 import BeautifulSoup
 import logging
+from progress.bar import IncrementalBar
 
 
 class KnownError(Exception):
@@ -58,6 +59,7 @@ def get_name(link, folder=None, extra=None):
 def get_link(soup, new_folder, link):
     logging.info('Getting links')
     list_link = soup.find_all("link")
+    bar = IncrementalBar('Loading links', max=len(list_link))
     for i in list_link:
         j = i['href']
         if len(j) >= 2:
@@ -67,11 +69,15 @@ def get_link(soup, new_folder, link):
                 with open(path_to_extra_file, 'w', encoding='utf-8') as f2:
                     f2.write(load_page(link + j))
                 i['href'] = path_to_extra_file
+        bar.next()
+    bar.finish()
 
 
 def get_scripts_img(soup, new_folder, link):
     logging.info('Getting scripts and img')
-    for i in soup.find_all(["script", "img"]):
+    list_img_scr = soup.find_all(["script", "img"])
+    bar = IncrementalBar('Loading scripts amd images', max=len(list_img_scr))
+    for i in list_img_scr:
         if 'src' in i.attrs:
             j = i['src']
             if j[0] == '/' and j[1] != '/':
@@ -80,6 +86,8 @@ def get_scripts_img(soup, new_folder, link):
                 with open(path_to_extra_file, 'w', encoding='utf-8') as f2:
                     f2.write(load_page(link + j))
                 i['src'] = path_to_extra_file
+        bar.next()
+    bar.finish()
 
 
 def save_page(link, folder='', level_logging=''):

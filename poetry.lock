@@ -184,6 +184,14 @@ dev = ["pre-commit", "tox"]
 
 [[package]]
 category = "main"
+description = "Easy to use progress bars"
+name = "progress"
+optional = false
+python-versions = "*"
+version = "1.5"
+
+[[package]]
+category = "main"
 description = "library with cross-python path, ini-parsing, io, code, log facilities"
 name = "py"
 optional = false
@@ -324,7 +332,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "8482b5ad066d903ddf378261be3accf52c94901a9b2093c60d8f71bb43d05e10"
+content-hash = "82283635c4c761e2d87030e55466fc28106809531e897d7eb94b3d1bdee8dcfd"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -445,6 +453,9 @@ packaging = [
 pluggy = [
     {file = "pluggy-0.13.1-py2.py3-none-any.whl", hash = "sha256:966c145cd83c96502c3c3868f50408687b38434af77734af1e9ca461a4081d2d"},
     {file = "pluggy-0.13.1.tar.gz", hash = "sha256:15b2acde666561e1298d71b523007ed7364de07029219b604cf808bfa1c765b0"},
+]
+progress = [
+    {file = "progress-1.5.tar.gz", hash = "sha256:69ecedd1d1bbe71bf6313d88d1e6c4d2957b7f1d4f71312c211257f7dae64372"},
 ]
 py = [
     {file = "py-1.8.1-py2.py3-none-any.whl", hash = "sha256:c20fdd83a5dbc0af9efd622bee9a5564e278f6380fffcacc43ba6f43db2813b0"},

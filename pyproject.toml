@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "stanislavglazko_page_loader"
-version = "0.7.0"
+version = "0.8.0"
 description = ""
 authors = ["stanislavglazko <stanislavglazko@gmail.com>"]
 packages = [
@@ -12,6 +12,7 @@ python = "^3.6"
 pytest-cov = "^2.8.1"
 bs4 = "^0.0.1"
 lxml = "^4.5.1"
+progress = "^1.5"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.8.1"
