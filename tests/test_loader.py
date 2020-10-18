@@ -1,35 +1,37 @@
-import pytest
+import logging
 import os
 import tempfile
+import pytest
 from page_loader import loader
-import logging
 
 
-check = {
-    'https://exler.ru': ('exler-ru.html', 'exler-ru_files'),
-    'https://brodude.ru': ('brodude-ru.html', 'brodude-ru_files'),
-    'https://meduza.io': ('meduza-io.html', 'meduza-io_files'),
-}
-
-
-def test():
-    for key, item in check.items():
-        with tempfile.TemporaryDirectory() as temp:
-            result = loader.save_page(key, temp, level_logging='debug')
-            assert result[0] == os.path.join(temp, item[0])
-            assert result[1] == os.path.join(temp, item[1])
-            assert os.path.isfile(result[0]) is True
-            assert os.path.exists(result[1]) is True
+def test_load():
+    link_for_test = 'https://stanislavglazko.github.io/github.io/'
+    name_page_for_test = 'stanislavglazko-github-io-github-io.html'
+    name_folder_for_test = 'stanislavglazko-github-io-github-io_files'
+    name_file_for_test = 'stanislavglazko-github-io-github-io-style.css'
+    with tempfile.TemporaryDirectory() as temp:
+        result = loader.load(link_for_test, temp)
+        name_page, name_folder_for_files, path_to_page, path_to_folder_for_files, name_file = result
+        assert name_page == name_page_for_test
+        assert name_folder_for_files == name_folder_for_test
+        assert name_file == os.path.join(temp, name_folder_for_test, name_file_for_test)
+        assert path_to_page == os.path.join(temp, name_page_for_test)
+        assert path_to_folder_for_files == os.path.join(temp, name_folder_for_test)
+        assert os.path.isfile(path_to_page)
+        assert os.path.exists(path_to_folder_for_files)
 
 
 def test_exception():
     with pytest.raises(loader.KnownError) as e_info:
-        loader.save_page('brodude')
-    assert 'URL error' in str(e_info.value)
+        loader.load('stanislavglazko.github.io/github.io/')
+    assert 'Invalid URL. No schema supplied' in str(e_info.value)
     with pytest.raises(loader.KnownError) as e_info:
-        loader.save_page('https://brodude.ru', level_logging='BBB')
-    assert 'Level is not correct' in str(e_info.value)
+        loader.load('ht://stanislavglazko.github.io/github.io/')
+    assert 'Invalid URL. Invalid scheme' in str(e_info.value)
     with pytest.raises(loader.KnownError) as e_info:
-        loader.save_page('https://brodude.ru', 'ccc')
-    print(str(e_info.value))
+        loader.load('http://httpbin.org/status/404')
+    assert 'status_code != 200' in str(e_info.value)
+    with pytest.raises(loader.KnownError) as e_info:
+        loader.load('https://stanislavglazko.github.io/github.io/', 'unreal_path_to_file')
     assert 'No such directory' in str(e_info.value)

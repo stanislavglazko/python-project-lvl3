@@ -15,5 +15,7 @@ check: selfcheck lint
 build: check
 	@poetry build
 
-run_test:
+test:
 	poetry run pytest --cov=page_loader --cov-report xml tests/
+
+.PHONY: install test lint selfcheck check build publish

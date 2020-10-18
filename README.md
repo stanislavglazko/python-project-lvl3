@@ -6,10 +6,16 @@
 
 Hello!
 
-Load a page with my tool! 
+Load a page with my tool - Page Loader. 
 
-To load a page write 'page-loader' and  a link with 'http' or 'https' part and a path to a folder for saving the page 
+To load a page write 'page-loader' and  a link with 'http' or 'https' part and a path to a folder for saving the page and a level of logging, which you want  
 You are able not to write the path to the folder if you want to save the page in current folder
+You are able not to write level of logging if you want to use info level of logging
+
+page-loader --output=path_to_saving_files --level=level_of_logging_which_you_want link_with_https
+
+Example:
+page-loader --output=/Users/stanislavglazko/Desktop/folder --level=info https://stanislavglazko.github.io/github.io/ 
 
 <a href="https://asciinema.org/a/W3ecBbOdniDXdJKuWVe53lHKX" target="_blank"><img src="https://asciinema.org/a/W3ecBbOdniDXdJKuWVe53lHKX.svg" /></a>
 

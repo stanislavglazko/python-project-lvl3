@@ -1,13 +1,18 @@
-from page_loader.cli import parse_args
-from page_loader.loader import save_page, KnownError
+import logging
 import sys
+from page_loader.cli import args
+from page_loader.loader import load, level, KnownError
 
 
 def main():
-    args = parse_args()
+    level_logging = args.level
+    if level_logging:
+        level(level_logging)
     try:
-        save_page(args.link, args.output, level_logging=args.level)
-    except KnownError:
+        load(args.link, args.output)
+    except KnownError as e:
+        logging.error(e.message)
+        logging.debug(e.trace)
         sys.exit(1)
 
 
