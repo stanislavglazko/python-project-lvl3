@@ -1,146 +1,150 @@
-import requests
-import re
-import os
-from bs4 import BeautifulSoup
 import logging
+import os
+import re
+import traceback
+import magic
+import requests
+from bs4 import BeautifulSoup
 from progress.bar import IncrementalBar
 
 
 class KnownError(Exception):
-    pass
+    def __init__(self, message, trace):
+        self.message = message
+        self.trace = trace
 
 
-list_of_logging = ['debug', 'DEBUG', 'INFO', 'info', 'warning', 'WARNING',
-                   'ERROR', 'error', 'critical', 'CRITICAL', None, '']
+def level(level_logging):
+    dict_of_level = {'debug': logging.DEBUG,
+                     'warning': logging.WARNING,
+                     'error': logging.ERROR,
+                     'critical': logging.CRITICAL,
+                     'info': logging.INFO,
+                     }
+    return logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s',
+                               filename='my.log',
+                               filemode='w',
+                               level=dict_of_level[level_logging])
 
 
 def load_page(link):
     logging.info('Loading page')
     try:
         page = requests.get(link)
-        assert page.status_code == 200
+        page.raise_for_status()
     except requests.exceptions.MissingSchema as e:
-        logging.error('Invalid URL. No schema supplied', exc_info=True)
-        raise KnownError('URL error') from e
+        trace = traceback.format_exc()
+        raise KnownError('Invalid URL. No schema supplied', trace) from e
+    except requests.exceptions.InvalidSchema as e:
+        trace = traceback.format_exc()
+        raise KnownError('Invalid URL. Invalid scheme', trace) from e
+    except requests.exceptions.HTTPError as e:
+        trace = traceback.format_exc()
+        raise KnownError('status_code != 200', trace) from e
     except requests.exceptions.ConnectionError as e:
-        logging.error('Connection error', exc_info=True)
-        raise KnownError('Connection error') from e
-    except AssertionError as e:
-        logging.error('Assertion error', exc_info=True)
-        raise KnownError('Assertion error') from e
+        trace = traceback.format_exc()
+        raise KnownError('Connection error', trace) from e
     return page.text
 
 
-def get_name(link, folder=None, extra=None):
-    logging.info('Getting name')
+def get_name(link, naming_folder=False, naming_files=False):
+    if link[-1] == '/':
+        link = link[:-1]
     name = re.split('//', link)
     if len(name) != 1:
         name = name[1]
     else:
         name = name[0]
-    result = ''
-    if extra:
-        name, f = os.path.splitext(name)
+    if naming_files:
+        name, extension = os.path.splitext(name)
+    final_name = ''
     for letter in name:
         letter_new = re.sub(r'\W', '-', letter)
-        result += letter_new
-        if len(result) >= 40:
+        final_name += letter_new
+        if len(final_name) >= 50:
             break
-    if folder:
-        final_name = '{}_files'.format(result)
-    elif extra:
-        final_name = '{}{}'.format(result, f)
+    if naming_files:
+        final_name += extension
+    elif naming_folder:
+        final_name += '_files'
     else:
-        final_name = '{}.html'.format(result)
-    logging.debug(final_name)
+        final_name += '.html'
     return final_name
 
 
-def get_link(soup, new_folder, link):
-    logging.info('Getting links')
-    list_link = soup.find_all("link")
-    bar = IncrementalBar('Loading links', max=len(list_link))
-    for i in list_link:
-        j = i['href']
-        if len(j) >= 2:
-            if j[0] == '/' and j[1] != '/':
-                path_to_extra_file = os.path.join(new_folder,
-                                                  get_name(j[1:], extra=1))
-                with open(path_to_extra_file, 'w', encoding='utf-8') as f2:
-                    f2.write(load_page(link + j))
-                i['href'] = path_to_extra_file
-        bar.next()
-    bar.finish()
+def change_page(page, url, path_to_folder_for_files):
+    logging.info('Changing page')
+    soup = BeautifulSoup(page, "lxml")
+    list_img_scr_link = soup.find_all(["script", "img", "link"])
+    result = []
+    atr = ''
+    link = ''
+    for i in list_img_scr_link:
+        if 'href' in i.attrs:
+            atr = 'href'
+            link = i['href']
+        elif 'src' in i.attrs:
+            atr = 'src'
+            link = i['src']
+        if atr != '':
+            if not re.findall(r'http|www|\.com|\.ru|'
+                              r'\.org|\.io|\.рф|\.su|'
+                              r'\.net|\.info', link):
+                if link[0] == '/':
+                    path = os.path.join(url, link[1:])
+                else:
+                    path = os.path.join(url, link)
+                path_to_extra_file = \
+                    os.path.join(
+                        path_to_folder_for_files,
+                        get_name(path, naming_files=True))
+                i[atr] = path_to_extra_file
+                result.append((path, path_to_extra_file))
+    changed_page = soup.prettify("utf-8")
+    return changed_page, result
 
 
-def get_scripts_img(soup, new_folder, link):
-    logging.info('Getting scripts and img')
-    list_img_scr = soup.find_all(["script", "img"])
-    bar = IncrementalBar('Loading scripts amd images', max=len(list_img_scr))
-    for i in list_img_scr:
-        if 'src' in i.attrs:
-            j = i['src']
-            if j[0] == '/' and j[1] != '/':
-                path_to_extra_file = os.path.join(new_folder,
-                                                  get_name(j[1:], extra=1))
-                with open(path_to_extra_file, 'w', encoding='utf-8') as f2:
-                    f2.write(load_page(link + j))
-                i['src'] = path_to_extra_file
-        bar.next()
-    bar.finish()
-
-
-def save_page(link, folder='', level_logging=''):
+def save_changed_page(changed_page, path_to_page):
+    logging.info('Saving page')
     try:
-        assert level_logging in list_of_logging
-    except Exception as e:
-        logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s',
-                            filename='my.log',
-                            filemode='w',
-                            level=logging.ERROR)
-        logging.error('Your level of logging is not correct', exc_info=True)
-        raise KnownError('Level is not correct') from e
-    if level_logging == 'debug' or level_logging == 'DEBUG':
-        level_logging = logging.DEBUG
-    elif level_logging == 'warning' or level_logging == 'WARNING':
-        level_logging = logging.WARNING
-    elif level_logging == 'error' or level_logging == 'ERROR':
-        level_logging = logging.ERROR
-    elif level_logging == 'critical' or level_logging == 'CRITICAL':
-        level_logging = logging.CRITICAL
-    else:
-        level_logging = logging.INFO
-    logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s',
-                        filename='my.log',
-                        filemode='w',
-                        level=level_logging)
-    logging.debug(level_logging)
-    if folder is None:
-        path_to_file = get_name(link)
-    else:
-        path_to_file = os.path.join(folder, get_name(link))
-    logging.debug(path_to_file)
-    try:
-        with open(path_to_file, 'w', encoding='utf-8') as f:
-            f.write(load_page(link))
+        with open(path_to_page, "wb") as page:
+            page.write(changed_page)
     except IOError as e:
-        logging.error('No such directory', exc_info=True)
-        raise KnownError('No such directory') from e
-    with open(path_to_file, "r") as fx:
-        contents = fx.read()
-    soup = BeautifulSoup(contents, "lxml")
-    if folder is None:
-        new_folder = get_name(link, folder=1)
-    else:
-        new_folder = os.path.join(folder, get_name(link, folder=1))
+        info_for_debug = traceback.format_exc()
+        raise KnownError('No such directory', info_for_debug) from e
+
+
+def load_extra_files(source):
+    logging.info('Loading links, images, scripts')
+    bar = IncrementalBar('Loading scripts amd images', max=len(source))
+    for link, path_to_extra_file in source:
+        r = requests.get(link)
+        mime_types = {'text/html', 'text/css', 'text/javascript'}
+        mime_type = magic.from_buffer(r.content, mime=True)
+        if mime_type in mime_types:
+            with open(path_to_extra_file, 'w') as f:
+                f.write(r.text)
+        else:
+            with open(path_to_extra_file, 'wb') as f:
+                f.write(r.content)
+        bar.next()
+    bar.finish()
+
+
+def load(link, folder=''):
+    page = load_page(link)
+    name_page = get_name(link)
+    path_to_page = os.path.join(folder, name_page)
+    name_folder_for_files = get_name(link, naming_folder=True)
+    path_to_folder_for_files = os.path.join(folder, name_folder_for_files)
     try:
-        os.mkdir(new_folder)
+        os.mkdir(path_to_folder_for_files)
     except IOError:
         logging.warning('Do not save one page twice in one folder')
-    get_link(soup, new_folder, link)
-    get_scripts_img(soup, new_folder, link)
-    html = soup.prettify("utf-8")
-    with open(path_to_file, "wb") as file:
-        file.write(html)
+    changed_page, source_of_extra_files = \
+        change_page(page, link, path_to_folder_for_files)
+    save_changed_page(changed_page, path_to_page)
+    load_extra_files(source_of_extra_files)
     logging.info('The page is saved')
-    return path_to_file, new_folder
+    return name_page, name_folder_for_files, path_to_page, \
+        path_to_folder_for_files, source_of_extra_files[0][1]
