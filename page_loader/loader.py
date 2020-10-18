@@ -116,7 +116,7 @@ def save_changed_page(changed_page, path_to_page):
 
 def load_extra_files(source):
     logging.info('Loading links, images, scripts')
-    bar = IncrementalBar('Loading scripts amd images', max=len(source))
+    bar = IncrementalBar('Loading links, scripts amd images', max=len(source))
     for link, path_to_extra_file in source:
         r = requests.get(link)
         mime_types = {'text/html', 'text/css', 'text/javascript'}
