@@ -14,7 +14,7 @@ class KnownError(Exception):
         self.trace = trace
 
 
-def level(level_logging):
+def set_level(level_logging):
     dict_of_level = {'debug': logging.DEBUG,
                      'warning': logging.WARNING,
                      'error': logging.ERROR,
@@ -72,21 +72,21 @@ def get_name(link, naming_folder=False, naming_files=False):
     return final_name
 
 
-def change_page(page, url, path_to_folder_for_files):
+def update_links(page, url, path_to_folder_for_files):
     logging.info('Changing page')
     soup = BeautifulSoup(page, "lxml")
-    list_img_scr_link = soup.find_all(["script", "img", "link"])
+    links = soup.find_all(["script", "img", "link"])
     result = []
-    atr = ''
+    attr = ''
     link = ''
-    for i in list_img_scr_link:
-        if 'href' in i.attrs:
-            atr = 'href'
-            link = i['href']
-        elif 'src' in i.attrs:
-            atr = 'src'
-            link = i['src']
-        if atr != '':
+    for tag in links:
+        if 'href' in tag.attrs:
+            attr = 'href'
+            link = tag['href']
+        elif 'src' in tag.attrs:
+            attr = 'src'
+            link = tag['src']
+        if attr != '':
             if not re.findall(r'http|www|\.com|\.ru|'
                               r'\.org|\.io|\.рф|\.su|'
                               r'\.net|\.info', link):
@@ -98,7 +98,7 @@ def change_page(page, url, path_to_folder_for_files):
                     os.path.join(
                         path_to_folder_for_files,
                         get_name(path, naming_files=True))
-                i[atr] = path_to_extra_file
+                tag[attr] = path_to_extra_file
                 result.append((path, path_to_extra_file))
     changed_page = soup.prettify("utf-8")
     return changed_page, result
@@ -114,37 +114,45 @@ def save_changed_page(changed_page, path_to_page):
         raise KnownError('No such directory', info_for_debug) from e
 
 
-def load_extra_files(source):
-    logging.info('Loading links, images, scripts')
-    bar = IncrementalBar('Loading links, scripts amd images', max=len(source))
+def load_files(source):
+    logging.info('Loading links')
+    bar = IncrementalBar('Loading links', max=len(source))
     for link, path_to_extra_file in source:
         r = requests.get(link)
-        mime_types = {'text/html', 'text/css', 'text/javascript'}
+        text_types = {'text/html', 'text/css', 'text/javascript'}
         mime_type = magic.from_buffer(r.content, mime=True)
-        if mime_type in mime_types:
-            with open(path_to_extra_file, 'w') as f:
-                f.write(r.text)
-        else:
-            with open(path_to_extra_file, 'wb') as f:
-                f.write(r.content)
+        mode, data = ('w', r.text) if mime_type in text_types \
+            else ('wb', r.content)
+        with open(path_to_extra_file, mode) as f:
+            f.write(data)
         bar.next()
     bar.finish()
 
 
 def load(link, folder=''):
+    bar = IncrementalBar('Loading page', max=8, suffix='%(percent)d%%')
     page = load_page(link)
-    name_page = get_name(link)
-    path_to_page = os.path.join(folder, name_page)
-    name_folder_for_files = get_name(link, naming_folder=True)
-    path_to_folder_for_files = os.path.join(folder, name_folder_for_files)
+    bar.next()
+    name_of_page = get_name(link)
+    bar.next()
+    path_to_page = os.path.join(folder, name_of_page)
+    bar.next()
+    name_of_folder_for_files = get_name(link, naming_folder=True)
+    bar.next()
+    path_to_folder_for_files = os.path.join(folder, name_of_folder_for_files)
     try:
         os.mkdir(path_to_folder_for_files)
     except IOError:
         logging.warning('Do not save one page twice in one folder')
-    changed_page, source_of_extra_files = \
-        change_page(page, link, path_to_folder_for_files)
+    bar.next()
+    changed_page, source_of_files = \
+        update_links(page, link, path_to_folder_for_files)
+    bar.next()
     save_changed_page(changed_page, path_to_page)
-    load_extra_files(source_of_extra_files)
+    bar.next()
+    load_files(source_of_files)
+    bar.next()
+    bar.finish()
     logging.info('The page is saved')
-    return name_page, name_folder_for_files, path_to_page, \
-        path_to_folder_for_files, source_of_extra_files[0][1]
+    return name_of_page, name_of_folder_for_files, path_to_page, \
+        path_to_folder_for_files, source_of_files[0][1]

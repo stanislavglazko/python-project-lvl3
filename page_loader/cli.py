@@ -15,4 +15,3 @@ parser.add_argument(
     choices=['debug', 'info', 'warning', 'error', 'critical'],
     help='level of logging'
 )
-args = parser.parse_args()
