@@ -90,10 +90,8 @@ def update_links(page, url, path_to_folder_for_files):
             if not re.findall(r'http|www|\.com|\.ru|'
                               r'\.org|\.io|\.рф|\.su|'
                               r'\.net|\.info', link):
-                if link[0] == '/':
-                    path = os.path.join(url, link[1:])
-                else:
-                    path = os.path.join(url, link)
+                link = link.lstrip('/')
+                path = os.path.join(url, link)
                 path_to_extra_file = \
                     os.path.join(
                         path_to_folder_for_files,
