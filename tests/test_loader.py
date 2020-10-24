@@ -19,6 +19,7 @@ def test_load():
         assert path_to_page == os.path.join(temp, name_page_for_test)
         assert path_to_folder_for_files == os.path.join(temp, name_folder_for_test)
         assert os.path.isfile(path_to_page)
+        assert os.path.isfile(name_file)
         assert os.path.exists(path_to_folder_for_files)
 
 

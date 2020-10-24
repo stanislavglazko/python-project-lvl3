@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "stanislavglazko_page_loader"
-version = "0.9.1"
+version = "0.9.3"
 description = ""
 authors = ["stanislavglazko <stanislavglazko@gmail.com>"]
 packages = [

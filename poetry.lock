@@ -136,14 +136,6 @@ version = "1.1.1"
 
 [[package]]
 category = "main"
-description = "libmagic bindings"
-name = "libmagic"
-optional = false
-python-versions = "*"
-version = "1.0"
-
-[[package]]
-category = "main"
 description = "Powerful and Pythonic XML processing library combining libxml2/libxslt with the ElementTree API."
 name = "lxml"
 optional = false
@@ -351,7 +343,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "jaraco.test (>=3.2.0)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [metadata]
-content-hash = "2f50b6868677a6c8defdffe1fa2d854bd4d289e59f2cf230a7edf5aa5872b0d8"
+content-hash = "5d80723f6a5666bef520b6a617dee40980784dda714f301ce8480e7dcba64894"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -434,9 +426,6 @@ importlib-metadata = [
 iniconfig = [
     {file = "iniconfig-1.1.1-py2.py3-none-any.whl", hash = "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3"},
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
-]
-libmagic = [
-    {file = "libmagic-1.0.tar.gz", hash = "sha256:649f1ce7fb7c92796badbb812555e4a926351da4f5cdf82e810b5cd371aedf8d"},
 ]
 lxml = [
     {file = "lxml-4.6.0-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:f8266e58a0c464382057f5a880258fadccf0a92a34669dc2802bc3d3c160a5fd"},
