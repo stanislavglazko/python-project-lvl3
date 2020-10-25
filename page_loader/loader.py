@@ -133,10 +133,12 @@ def load(link, folder=''):
     name_of_folder_for_files = get_name(link, naming_folder=True)
     bar.next()
     path_to_folder_for_files = os.path.join(folder, name_of_folder_for_files)
-    try:
-        os.mkdir(path_to_folder_for_files)
-    except IOError:
-        logging.warning('Do not save one page twice in one folder')
+    if not os.path.exists(path_to_folder_for_files):
+        try:
+            os.mkdir(path_to_folder_for_files)
+        except IOError as e:
+            trace = traceback.format_exc()
+            raise KnownError('No such directory', trace) from e
     bar.next()
     changed_page, source_of_files = \
         update_links(page, link, path_to_folder_for_files)
