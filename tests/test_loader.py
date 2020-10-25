@@ -35,4 +35,4 @@ def test_exception():
     assert 'status_code != 200' in str(e_info.value)
     with pytest.raises(loader.KnownError) as e_info:
         loader.load('https://stanislavglazko.github.io/github.io/', 'unreal_path_to_file')
-    assert 'No such directory' in str(e_info.value)
+    assert 'Your folder is incorrect' in str(e_info.value)

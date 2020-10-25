@@ -104,7 +104,7 @@ def save_changed_page(changed_page, path_to_page):
             page.write(changed_page)
     except IOError as e:
         info_for_debug = traceback.format_exc()
-        raise KnownError('No such directory', info_for_debug) from e
+        raise KnownError('Your folder is incorrect', info_for_debug) from e
 
 
 def load_files(source):
@@ -138,7 +138,7 @@ def load(link, folder=''):
             os.mkdir(path_to_folder_for_files)
         except IOError as e:
             trace = traceback.format_exc()
-            raise KnownError('No such directory', trace) from e
+            raise KnownError('Your folder is incorrect', trace) from e
     bar.next()
     changed_page, source_of_files = \
         update_links(page, link, path_to_folder_for_files)
