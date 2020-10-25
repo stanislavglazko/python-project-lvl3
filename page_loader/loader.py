@@ -48,13 +48,8 @@ def load_page(link):
 
 
 def get_name(link, naming_folder=False, naming_files=False):
-    if link[-1] == '/':
-        link = link[:-1]
-    name = re.split('//', link)
-    if len(name) != 1:
-        name = name[1]
-    else:
-        name = name[0]
+    link = link.rstrip('/')
+    _, name = re.split('//', link)
     if naming_files:
         name, extension = os.path.splitext(name)
     final_name = ''
