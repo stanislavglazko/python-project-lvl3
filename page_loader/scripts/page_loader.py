@@ -10,8 +10,9 @@ def main():
     try:
         loader.load(args.link, args.output)
     except loader.KnownError as e:
-        logging.error(e.message)
-        logging.debug(e.trace)
+        cause = e.__cause__
+        exc_info = (cause.__class__, cause, cause.__traceback__)
+        logging.error(str(e), exc_info=exc_info)
         sys.exit(1)
 
 

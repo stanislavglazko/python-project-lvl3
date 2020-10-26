@@ -1,7 +1,6 @@
 import logging
 import os
 import re
-import traceback
 import magic
 import requests
 from bs4 import BeautifulSoup
@@ -9,9 +8,7 @@ from progress.bar import IncrementalBar
 
 
 class KnownError(Exception):
-    def __init__(self, message, trace):
-        self.message = message
-        self.trace = trace
+    pass
 
 
 def set_level(level_logging):
@@ -33,17 +30,13 @@ def load_page(link):
         page = requests.get(link)
         page.raise_for_status()
     except requests.exceptions.MissingSchema as e:
-        trace = traceback.format_exc()
-        raise KnownError('Invalid URL. No schema supplied', trace) from e
+        raise KnownError('Invalid URL. No schema supplied') from e
     except requests.exceptions.InvalidSchema as e:
-        trace = traceback.format_exc()
-        raise KnownError('Invalid URL. Invalid scheme', trace) from e
+        raise KnownError('Invalid URL. Invalid scheme') from e
     except requests.exceptions.HTTPError as e:
-        trace = traceback.format_exc()
-        raise KnownError('status_code != 200', trace) from e
+        raise KnownError('status_code != 200') from e
     except requests.exceptions.ConnectionError as e:
-        trace = traceback.format_exc()
-        raise KnownError('Connection error', trace) from e
+        raise KnownError('Connection error') from e
     return page.text
 
 
@@ -103,15 +96,20 @@ def save_changed_page(changed_page, path_to_page):
         with open(path_to_page, "wb") as page:
             page.write(changed_page)
     except IOError as e:
-        info_for_debug = traceback.format_exc()
-        raise KnownError('Your folder is incorrect', info_for_debug) from e
+        raise KnownError('Your folder is incorrect') from e
 
 
 def load_files(source):
     logging.info('Loading links')
     bar = IncrementalBar('Loading links', max=len(source))
     for link, path_to_extra_file in source:
-        r = requests.get(link)
+        try:
+            r = requests.get(link)
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            raise KnownError('status_code != 200') from e
+        except requests.exceptions.ConnectionError as e:
+            raise KnownError('Connection error') from e
         text_types = {'text/html', 'text/css', 'text/javascript'}
         mime_type = magic.from_buffer(r.content, mime=True)
         mode, data = ('w', r.text) if mime_type in text_types \
@@ -137,8 +135,7 @@ def load(link, folder=''):
         try:
             os.mkdir(path_to_folder_for_files)
         except IOError as e:
-            trace = traceback.format_exc()
-            raise KnownError('Your folder is incorrect', trace) from e
+            raise KnownError('Your folder is incorrect') from e
     bar.next()
     changed_page, source_of_files = \
         update_links(page, link, path_to_folder_for_files)
