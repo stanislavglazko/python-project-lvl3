@@ -183,6 +183,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "prompt"
+version = "0.4.1"
+description = "Library for prompting input on the command line."
+category = "main"
+optional = false
+python-versions = ">=3.3"
+
+[[package]]
 name = "py"
 version = "1.9.0"
 description = "library with cross-python path, ini-parsing, io, code, log facilities"
@@ -330,7 +338,7 @@ testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "5d80723f6a5666bef520b6a617dee40980784dda714f301ce8480e7dcba64894"
+content-hash = "1c185a0131e28f79458833da396f46e1e5502fea47de27c75a87aac9ab64ca15"
 
 [metadata.files]
 atomicwrites = [
@@ -465,6 +473,10 @@ pluggy = [
 ]
 progress = [
     {file = "progress-1.5.tar.gz", hash = "sha256:69ecedd1d1bbe71bf6313d88d1e6c4d2957b7f1d4f71312c211257f7dae64372"},
+]
+prompt = [
+    {file = "prompt-0.4.1-py3-none-any.whl", hash = "sha256:98527de8dc3f0aa29669a39fbffeaf578ba6654dc836f737b6a5c6f9279002b7"},
+    {file = "prompt-0.4.1.tar.gz", hash = "sha256:8a7694b88f8c65188a983315e72582bf42fcc251b97042be1d2a2ad1aa0ebe0e"},
 ]
 py = [
     {file = "py-1.9.0-py2.py3-none-any.whl", hash = "sha256:366389d1db726cd2fcfc79732e75410e5fe4d31db13692115529d34069a043c2"},
