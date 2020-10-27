@@ -1,5 +1,8 @@
 import argparse
 
+DEBUG, INFO, WARNING, ERROR, CRITICAL = \
+    'debug', 'info', 'error', 'warning', 'critical'
+
 parser = argparse.ArgumentParser(description='Page loader')
 parser.add_argument('link', type=str)
 parser.add_argument(
@@ -11,7 +14,7 @@ parser.add_argument(
 parser.add_argument(
     '-l', '--level',
     type=str,
-    default='info',
-    choices=['debug', 'info', 'warning', 'error', 'critical'],
+    default=INFO,
+    choices=[DEBUG, INFO, WARNING, ERROR, CRITICAL],
     help='level of logging'
 )

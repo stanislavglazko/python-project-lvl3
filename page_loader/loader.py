@@ -5,6 +5,7 @@ import magic
 import requests
 from bs4 import BeautifulSoup
 from progress.bar import IncrementalBar
+from page_loader.cli import DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 
 class KnownError(Exception):
@@ -12,11 +13,11 @@ class KnownError(Exception):
 
 
 def set_level(level_logging):
-    dict_of_level = {'debug': logging.DEBUG,
-                     'warning': logging.WARNING,
-                     'error': logging.ERROR,
-                     'critical': logging.CRITICAL,
-                     'info': logging.INFO,
+    dict_of_level = {DEBUG: logging.DEBUG,
+                     WARNING: logging.WARNING,
+                     ERROR: logging.ERROR,
+                     CRITICAL: logging.CRITICAL,
+                     INFO: logging.INFO,
                      }
     return logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s',
                                filename='my.log',
