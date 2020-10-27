@@ -65,6 +65,7 @@ def update_links(page, url, path_to_folder_for_files):
     logging.info('Changing page')
     soup = BeautifulSoup(page, "lxml")
     links = soup.find_all(["script", "img", "link"])
+    forbidden_prefixes = ['http', 'www']
     result = []
     attr = ''
     link = ''
@@ -76,9 +77,8 @@ def update_links(page, url, path_to_folder_for_files):
             attr = 'src'
             link = tag['src']
         if attr != '':
-            if not re.findall(r'http|www|\.com|\.ru|'
-                              r'\.org|\.io|\.рф|\.su|'
-                              r'\.net|\.info', link):
+            if all(not link.startswith(prefix)
+                   for prefix in forbidden_prefixes):
                 link = link.lstrip('/')
                 path = os.path.join(url, link)
                 path_to_extra_file = \
