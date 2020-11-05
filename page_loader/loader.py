@@ -107,7 +107,7 @@ def load_files(source):
             r = requests.get(link)
             r.raise_for_status()
         except requests.exceptions.HTTPError as e:
-            raise KnownError('status_code != 200') from e
+            raise KnownError('Connection failed') from e
         except requests.exceptions.ConnectionError as e:
             raise KnownError('Connection error') from e
         text_types = {'text/html', 'text/css', 'text/javascript'}
