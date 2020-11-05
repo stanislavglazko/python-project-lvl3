@@ -30,12 +30,11 @@ def load_page(link):
     try:
         page = requests.get(link)
         page.raise_for_status()
-    except requests.exceptions.MissingSchema as e:
-        raise KnownError('Invalid URL. No schema supplied') from e
-    except requests.exceptions.InvalidSchema as e:
-        raise KnownError('Invalid URL. Invalid scheme') from e
+    except (requests.exceptions.MissingSchema,
+            requests.exceptions.InvalidSchema) as e:
+        raise KnownError('Wrong address!') from e
     except requests.exceptions.HTTPError as e:
-        raise KnownError('status_code != 200') from e
+        raise KnownError('Connection failed') from e
     except requests.exceptions.ConnectionError as e:
         raise KnownError('Connection error') from e
     return page.text
@@ -122,24 +121,21 @@ def load_files(source):
 
 
 def load(link, folder=''):
-    bar = IncrementalBar('Loading page', max=8, suffix='%(percent)d%%')
+    bar = IncrementalBar('Loading page', max=5, suffix='%(percent)d%%')
     page = load_page(link)
     bar.next()
     name_of_page = get_name(link)
-    bar.next()
     path_to_page = os.path.join(folder, name_of_page)
-    bar.next()
-    name_of_folder_for_files = get_name(link, naming_folder=True)
-    bar.next()
-    path_to_folder_for_files = os.path.join(folder, name_of_folder_for_files)
-    if not os.path.exists(path_to_folder_for_files):
+    name_of_folder = get_name(link, naming_folder=True)
+    path_to_folder = os.path.join(folder, name_of_folder)
+    if not os.path.exists(path_to_folder):
         try:
-            os.mkdir(path_to_folder_for_files)
+            os.mkdir(path_to_folder)
         except IOError as e:
             raise KnownError('Your folder is incorrect') from e
     bar.next()
     changed_page, source_of_files = \
-        update_links(page, link, path_to_folder_for_files)
+        update_links(page, link, path_to_folder)
     bar.next()
     save_changed_page(changed_page, path_to_page)
     bar.next()
@@ -147,5 +143,4 @@ def load(link, folder=''):
     bar.next()
     bar.finish()
     logging.info('The page is saved')
-    return name_of_page, name_of_folder_for_files, path_to_page, \
-        path_to_folder_for_files, source_of_files[0][1]
+    return name_of_page, name_of_folder, path_to_page, path_to_folder

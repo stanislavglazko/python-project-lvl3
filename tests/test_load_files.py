@@ -1,9 +1,6 @@
-import logging
 import os
 import tempfile
-import magic
 import pytest
-import requests
 from page_loader import loader
 
 
