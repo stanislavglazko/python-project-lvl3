@@ -5,6 +5,7 @@ import magic
 import requests
 from bs4 import BeautifulSoup
 from progress.bar import IncrementalBar
+from urllib.parse import urlparse
 from page_loader.cli import DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 
@@ -42,7 +43,8 @@ def load_page(link):
 
 def get_name(link, naming_folder=False, naming_files=False):
     link = link.rstrip('/')
-    _, name = re.split('//', link)
+    o = urlparse(link)
+    name = o.netloc + o.path
     if naming_files:
         name, extension = os.path.splitext(name)
     final_name = ''
